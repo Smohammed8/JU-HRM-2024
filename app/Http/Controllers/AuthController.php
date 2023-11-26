@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 class AuthController extends Controller
 {
-    
+
 
     protected $redirectTo = '/notice';
 
@@ -79,12 +79,12 @@ class AuthController extends Controller
     // }
 
     public  function login(Request $credentials)
- //   public static function login(Request $credentials)
+    //   public static function login(Request $credentials)
     {
         $uid = $credentials->input('username');
         $password = $credentials->input('password');
         $user = User::where('username', '=', $uid)->first();
-        if ($uid == "super" or $uid == "admin" or $uid == "seid" ) {
+        if ($uid == "super" or $uid == "admin" or $uid == "seid") {
             $credentials = ["username" => $uid, "password" => $password];
             if (Auth::attempt($credentials)) { // Check if the user is disabled
                 //$request->session()->regenerate();
@@ -93,14 +93,13 @@ class AuthController extends Controller
                     return Redirect::back()->withErrors(['username' => 'Your account is not active. Contact an admin for assistance']);
                 }
                 if (Auth::attempt($credentials)) {
-      
-                    return view('auth.progress');
-                   }
-                 //  return redirect()->intended($this->redirectPath());
-                //  return redirect(route('notice'));
-            }
-            
-            else {
+
+                    //return view('auth.progress');
+                    return redirect(route('notice'));
+                }
+                //  return redirect()->intended($this->redirectPath());
+
+            } else {
 
                 return Redirect::back()->withErrors(['username' => 'Invalid Credentials']);
             }
@@ -118,22 +117,22 @@ class AuthController extends Controller
                 $search = ldap_search($ldapconn, 'dc=ju,dc=edu,dc=et', "uid=$uid");
                 $info = ldap_get_entries($ldapconn, $search);
 
-                $name = explode(' ',$info[0]['cn'][0]);
+                $name = explode(' ', $info[0]['cn'][0]);
                 $first_name = $name[0];
                 $middle_name = $name[1];
                 $last_name = $name[2];
 
-            //     if (isset($info[0]['sn'])) {
-            //         if ($info[0]['sn']['count'] > 0) {
-            //             $middle_name = $info[0]['sn'][0];
-            //         }
-            //     }
-            //   //  ,$names[2]
-            //     if (isset($info[0]['sn'])) {
-            //         if ($info[0]['sn']['count'] > 1) {
-            //             $last_name = $info[0]['sn'][0];
-            //         }
-            //     }
+                //     if (isset($info[0]['sn'])) {
+                //         if ($info[0]['sn']['count'] > 0) {
+                //             $middle_name = $info[0]['sn'][0];
+                //         }
+                //     }
+                //   //  ,$names[2]
+                //     if (isset($info[0]['sn'])) {
+                //         if ($info[0]['sn']['count'] > 1) {
+                //             $last_name = $info[0]['sn'][0];
+                //         }
+                //     }
                 $email = 'Unknown';
                 if (isset($info[0]['mail'])) {
                     if ($info[0]['mail']['count'] > 0) {
@@ -159,9 +158,9 @@ class AuthController extends Controller
                             'password' => Hash::make($password),
                             'name' => ucwords($first_name) . ' ' . ucwords($middle_name) . ' ' . ucwords($last_name),
                             'email' => $email,
-                            'is_disabled'=>1,
-                            'is_online'=>0,
-                            'last_login'=>null
+                            'is_disabled' => 1,
+                            'is_online' => 0,
+                            'last_login' => null
 
                         ]);
 
@@ -171,16 +170,14 @@ class AuthController extends Controller
                             // $user->update(['is_online' => true]); //
                             // $user->update(['last_login' => now()]);
 
-                       
+
 
                             return redirect(route('notice'));
                         }
-                    } 
-                    catch (Exception $e) {
+                    } catch (Exception $e) {
                         return $e;
                     }
-                } 
-                else {
+                } else {
 
                     if ($user->isDisabled()) {
                         Auth::logout();

@@ -1219,9 +1219,9 @@
 
                                         <th>Type</th>
                                         <th>Name</th>
-                                        <th> Location </th>
-                                        <th> Date of given </th>
-                                        <th> Duration(in days) </th>
+                                        <th>Location </th>
+                                        <th>Date of given </th>
+                                        <th>Duration(in days) </th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>

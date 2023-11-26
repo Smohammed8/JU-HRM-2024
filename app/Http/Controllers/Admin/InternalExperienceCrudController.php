@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\InternalExperienceRequest;
 use App\Models\JobTitle;
 use App\Models\EmploymentType;
+use Prologue\Alerts\Facades\Alert;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
+use App\Http\Requests\InternalExperienceRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
-use Illuminate\Validation\ValidationException;
-use Prologue\Alerts\Facades\Alert;
-use Illuminate\Support\Facades\Route;
 
 /**
  * Class InternalExperienceCrudController
@@ -33,7 +34,7 @@ class InternalExperienceCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\InternalExperience::class);
         $employeeId = Route::current()->parameter('employee');
-        CRUD::setRoute(config('backpack.base.route_prefix') .'/'.$employeeId. '/internal-experience');
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/' . $employeeId . '/internal-experience');
         CRUD::setEntityNameStrings('internal experience', 'internal experiences');
         $this->setupBreadcrumb();
     }
@@ -44,15 +45,15 @@ class InternalExperienceCrudController extends CrudController
         $breadcrumbs = [
             'Admin' => route('dashboard'),
             'Employees' => route('employee.index'),
-            ucfirst($this->crud->entity_name_plural) => route('employee.show',['id'=>$employeeId]).'#employee_internal_experience',
+            ucfirst($this->crud->entity_name_plural) => route('employee.show', ['id' => $employeeId]) . '#employee_internal_experience',
         ];
-        if(in_array('show',explode('/',$this->crud->getRequest()->getRequestUri()))){
+        if (in_array('show', explode('/', $this->crud->getRequest()->getRequestUri()))) {
             $breadcrumbs['Preview'] = false;
         }
-        if(in_array('edit',explode('/',$this->crud->getRequest()->getRequestUri()))){
+        if (in_array('edit', explode('/', $this->crud->getRequest()->getRequestUri()))) {
             $breadcrumbs['Update'] = false;
         }
-        if(in_array('create',explode('/',$this->crud->getRequest()->getRequestUri()))){
+        if (in_array('create', explode('/', $this->crud->getRequest()->getRequestUri()))) {
             $breadcrumbs['Add'] = false;
         }
         $this->data['breadcrumbs'] = $breadcrumbs;
@@ -95,7 +96,7 @@ class InternalExperienceCrudController extends CrudController
         CRUD::field('job_title_id')->type('select2')->entity('jobTitle')->model(JobTitle::class)->attribute('name')->size(6);
 
         CRUD::field('employment_type_id')->type('select2')->entity('  employmentType')->model(EmploymentType::class)->attribute('name')->size(6);
-      
+
 
         // CRUD::field('position')->size(6);
         CRUD::field('start_date')->size(6);
@@ -116,9 +117,9 @@ class InternalExperienceCrudController extends CrudController
 
         if ($data['end_date'] !== null) {
 
-         if ($data['start_date'] >= $data['end_date']) {
-            throw ValidationException::withMessages(['start_date' => 'Start-date must be less than End-date!']);
-         }
+            if ($data['start_date'] >= $data['end_date']) {
+                throw ValidationException::withMessages(['start_date' => 'Start-date must be less than End-date!']);
+            }
         }
         $item = $this->crud->create($data);
         $this->data['entry'] = $this->crud->entry = $item;
@@ -127,24 +128,33 @@ class InternalExperienceCrudController extends CrudController
         return $this->crud->performSaveAction($item->getKey());
     }
 
-    public function update()
+    public function update($id)
     {
         $this->crud->hasAccessOrFail('update');
-    
+
         $request = $this->crud->validateRequest();
         $data = $this->crud->getStrippedSaveRequest();
-       if ($data['end_date'] !== null) {
-       if ($data['start_date'] >= $data['end_date']) {
-            throw ValidationException::withMessages(['start_date' => 'Start-date must be less than End-date!']);
+        if ($data['end_date'] !== null) {
+            if ($data['start_date'] >= $data['end_date']) {
+                throw ValidationException::withMessages(['start_date' => 'Start-date must be less than End-date!']);
+            }
         }
+        $item = $this->crud->model->findOrFail($id);
+
+        try {
+            $item->update($data);
+        } catch (\Exception $e) {
+            Log::error('Update Error: ' . $e->getMessage());
+            throw $e;
         }
-        $item = $this->crud->create($data);
+
         $this->data['entry'] = $this->crud->entry = $item;
+
         Alert::success(trans('backpack::crud.update_success'))->flash();
         $this->crud->setSaveAction();
         return $this->crud->performSaveAction($item->getKey());
-
     }
+
 
     /**
      * Define what happens when the Update operation is loaded.
