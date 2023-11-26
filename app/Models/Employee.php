@@ -45,14 +45,14 @@ class Employee extends  Model
     // use RevisionableTrait, CrudTrait, HasFactory, HasRoles;
 
 
-  
-  
+
+
 
     public function identifiableName()
     {
         return $this->name;
     }
-    protected $revisionEnabled = true; 
+    protected $revisionEnabled = true;
     protected $appends = ['name'];
     /**
      * The attributes that are mass assignable.
@@ -162,10 +162,10 @@ class Employee extends  Model
     {
         return $this->is_locked;
     }
-    
 
 
-    
+
+
     public function setDrivingLicenceAttribute($value)
     {
         $disk = "public";
@@ -198,10 +198,10 @@ class Employee extends  Model
         'job_title_id' => 'integer',
         'employment_type_id' => 'integer',
         'employment_status_id' => 'integer',
-        'employee_title_id' =>'integer',
-        'educational_level_id' =>'integer',
-        'user_id'=>'integer',
-        'employee_category_id'=>'integer'
+        'employee_title_id' => 'integer',
+        'educational_level_id' => 'integer',
+        'user_id' => 'integer',
+        'employee_category_id' => 'integer'
     ];
 
     public function getDateOfBirthAttribute()
@@ -212,8 +212,6 @@ class Employee extends  Model
     public function setDateOfBirthAttribute($dateOfBirth)
     {
         $this->attributes['date_of_birth'] = Constants::etToGc($dateOfBirth);
-
-       
     }
 
     public function getNameAttribute()
@@ -283,7 +281,6 @@ class Employee extends  Model
     public function employmentStatus()
     {
         return $this->belongsTo(EmploymentStatus::class);
-        
     }
 
 
@@ -296,14 +293,13 @@ class Employee extends  Model
 
     public function positionCode()
     {
-        return $this->hasOne(PositionCode::class,'employee_id','id');
+        return $this->hasOne(PositionCode::class, 'employee_id', 'id');
     }
 
 
     public function age()
     {
         return Carbon::parse($this->attributes['date_of_birth'])->age;
-        
     }
     public function employeeCategory()
     {
@@ -315,7 +311,7 @@ class Employee extends  Model
     {
         return $this->belongsTo(EmployeeSubCategory::class, 'employee_sub_category_id');
     }
-///$employees = Employee::with('employeeSubCategory')->get();
+    ///$employees = Employee::with('employeeSubCategory')->get();
     public function employmentType()
     {
         return $this->belongsTo(EmploymentType::class);
@@ -338,10 +334,10 @@ class Employee extends  Model
 
     public function getEmployementDateAttribute()
     {
-        if(!array_key_exists('employement_date',$this->attributes))
+        if (!array_key_exists('employement_date', $this->attributes))
             return null;
-        $employementDate =$this->attributes['employement_date'];
-        if($employementDate!=null){
+        $employementDate = $this->attributes['employement_date'];
+        if ($employementDate != null) {
             return Carbon::createFromDate(Constants::gcToEt($employementDate));
         }
         return Carbon::createFromDate(Constants::gcToEt($employementDate));
@@ -354,12 +350,12 @@ class Employee extends  Model
 
     public function getTotalInternalExperience()
     {
-        $employementDate =$this->attributes['employement_date'];
+        $employementDate = $this->attributes['employement_date'];
         return Carbon::parse($employementDate)->diff(\Carbon\Carbon::now());
     }
     public function getEmployementDateRange()
     {
-        $employementDate =$this->attributes['employement_date'];
+        $employementDate = $this->attributes['employement_date'];
         return Carbon::parse($employementDate)->diff(\Carbon\Carbon::now())->format('%y years, %m months and %d days') ?? '-';
     }
 
@@ -413,149 +409,154 @@ class Employee extends  Model
 
     public function externalExperiences(): HasMany
     {
-     
+
         return $this->hasMany(ExternalExperience::class, 'employee_id', 'id');
     }
 
-       // Add a method to calculate total experience for each internal experience
-   public function totalInternalExperiences()
-   {
-       $totalExperiences = [];
+    public function totalInternalExperiences()
+    {
+        $totalExperiences = [];
+        $sortedExperiences = $this->internalExperiences->sortBy('start_date');
 
-       // Sort internal experiences by start date
-       $sortedExperiences = $this->internalExperiences->sortBy('start_date');
+        foreach ($sortedExperiences as $key => $internalExperience) {
+            $startDate = $internalExperience->start_date;
+            $endDate = $internalExperience->end_date ?? Constants::gcToEt(now()); // Use current date if end_date is null
 
-       foreach ($sortedExperiences as $key => $internalExperience) {
-           $startDate = $internalExperience->start_date;
-           $endDate = $internalExperience->end_date ?? Constants::gcToEt(now()); // Use current date if end_date is null
-           if ($key > 0) {
-               $previousExperience = $sortedExperiences[$key - 1];
+            if ($key > 0) {
+                $previousExperience = $sortedExperiences[$key - 1];
 
-               if ($startDate < $previousExperience->end_date) {
-                   $startDate = $previousExperience->end_date;
-               }
-           }
-           $years = $startDate->diff($endDate)->y;
-           $months = $startDate->diff($endDate)->m;
-           $days = $startDate->diff($endDate)->d;
+                if ($startDate < $previousExperience->end_date) {
+                    $startDate = $previousExperience->end_date;
+                }
+            }
 
-           // Adjust for cases where months > 12
-           $years += intdiv($months, 12);
-           $months = $months % 12;
+            $dateDiff = $startDate->diff($endDate);
 
-           // Adjust for cases where days > 29
-           if ($days > 29) {
-               $months += intdiv($days, 30);
-               $days = $days % 30;
-           }
+            $totalYears = intdiv($dateDiff->y, 1);
+            $totalMonths = intdiv(($dateDiff->m + $dateDiff->y * 12), 12);
+            $totalDays = $dateDiff->d;
 
-           $totalExperiences[] = $years . ' years ' . $months . ' months ' . $days . ' days';
-       }
+            $totalExperiences[] = $totalYears . ' years ' . $totalMonths . ' months ' . $totalDays . ' days';
+        }
 
-       return $totalExperiences;
-   }
-
-   // Add a method to calculate the total sum of durations
-   public function calculateTotalSum()
-   {
-       $totalSum = [
-           'years' => 0,
-           'months' => 0,
-           'days' => 0,
-       ];
-
-       foreach ($this->totalInternalExperiences() as $experience) {
-           preg_match('/(\d+) years (\d+) months (\d+) days/', $experience, $matches);
-
-           $totalSum['years'] += (int)$matches[1];
-           $totalSum['months'] += (int)$matches[2];
-           $totalSum['days'] += (int)$matches[3];
-       }
-
-       return $totalSum;
-   }
-  ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-       // Add a method to calculate total experience for each internal experience
-       public function totalExeternalExperiences()
-       {
-           $totalExperiences = [];
-           // Sort internal experiences by start date
-           $sortedExperiences = $this->externalExperiences->sortBy('start_date');
-    
-           foreach ($sortedExperiences as $key => $externalExperiences) {
-               $startDate = $externalExperiences->start_date;
-               $endDate   = $externalExperiences->end_date ?? Constants::gcToEt(now()); // Use current date if end_date is null
-               if ($key > 0) {
-                   $previousExperience = $sortedExperiences[$key - 1];
-    
-                   if ($startDate < $previousExperience->end_date) {
-                       $startDate = $previousExperience->end_date;
-                   }
-               }
-               $years = $startDate->diff($endDate)->y;
-               $months = $startDate->diff($endDate)->m;
-               $days = $startDate->diff($endDate)->d;
-    
-               // Adjust for cases where months > 12
-               $years += intdiv($months, 12);
-               $months = $months % 12;
-    
-               // Adjust for cases where days > 29
-               if ($days > 29) {
-                   $months += intdiv($days, 30);
-                   $days = $days % 30;
-               }
-    
-               $totalExperiences[] = $years . ' years ' . $months . ' months ' . $days . ' days';
-           }
-    
-           return $totalExperiences;
-       }
-    
-       // Add a method to calculate the total sum of durations
-       public function calculateExTotalSum()
-       {
-           $totalSum = [
-               'years' => 0,
-               'months' => 0,
-               'days' => 0,
-           ];
-    
-           foreach ($this->totalExeternalExperiences() as $experience) {
-               preg_match('/(\d+) years (\d+) months (\d+) days/', $experience, $matches);
-    
-               $totalSum['years'] += (int)$matches[1];
-               $totalSum['months'] += (int)$matches[2];
-               $totalSum['days'] += (int)$matches[3];
-           }
-    
-           return $totalSum;
-       }
-
-
-
-public function totalExperiences()
-{
-    $totalSumInternal = $this->calculateTotalSum();
-    $totalSumExternal = $this->calculateExTotalSum();
-    // Merge the arrays to combine internal and external experience durations
-    $totalSum = [
-        'years' => $totalSumInternal['years'] + $totalSumExternal['years'],
-        'months' => $totalSumInternal['months'] + $totalSumExternal['months'],
-        'days' => $totalSumInternal['days'] + $totalSumExternal['days'],
-    ];
-    // Adjust for cases where months > 12
-    $totalSum['years'] += intdiv($totalSum['months'], 12);
-    $totalSum['months'] = $totalSum['months'] % 12;
-
-    // Adjust for cases where days > 29
-    if ($totalSum['days'] > 29) {
-        $totalSum['months'] += intdiv($totalSum['days'], 30);
-        $totalSum['days'] = $totalSum['days'] % 30;
+        return $totalExperiences;
     }
-    return $totalSum;
-}
+
+    public function calculateTotalSum()
+    {
+        $totalSum = [
+            'years' => 0,
+            'months' => 0,
+            'days' => 0,
+        ];
+
+        foreach ($this->totalInternalExperiences() as $experience) {
+            preg_match('/(\d+) years (\d+) months (\d+) days/', $experience, $matches);
+
+            $totalSum['years'] += (int)$matches[1];
+            $totalSum['months'] += (int)$matches[2];
+            $totalSum['days'] += (int)$matches[3];
+        }
+
+        // Adjust for cases where months > 12
+        $totalSum['years'] += intdiv($totalSum['months'], 12);
+        $totalSum['months'] = $totalSum['months'] % 12;
+
+        // Adjust for cases where days > 29
+        if ($totalSum['days'] > 29) {
+            $totalSum['months'] += intdiv($totalSum['days'], 30);
+            $totalSum['days'] = $totalSum['days'] % 30;
+        }
+
+        return $totalSum;
+    }
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    public function totalExeternalExperiences()
+    {
+        $totalExperiences = [];
+        // Sort external experiences by start date
+        $sortedExperiences = $this->externalExperiences->sortBy('start_date');
+
+        foreach ($sortedExperiences as $key => $externalExperience) {
+            $startDate = $externalExperience->start_date;
+            $endDate = $externalExperience->end_date ?? Constants::gcToEt(now()); // Use current date if end_date is null
+
+            if ($key > 0) {
+                $previousExperience = $sortedExperiences[$key - 1];
+
+                if ($startDate < $previousExperience->end_date) {
+                    $startDate = $previousExperience->end_date;
+                }
+            }
+
+            $dateDiff = $startDate->diff($endDate);
+
+            $totalYears = intdiv($dateDiff->y, 1);
+            $totalMonths = intdiv(($dateDiff->m + $dateDiff->y * 12), 12);
+            $totalDays = $dateDiff->d;
+
+            $totalExperiences[] = $totalYears . ' years ' . $totalMonths . ' months ' . $totalDays . ' days';
+        }
+
+        return $totalExperiences;
+    }
+
+    public function calculateExTotalSum()
+    {
+        $totalSum = [
+            'years' => 0,
+            'months' => 0,
+            'days' => 0,
+        ];
+
+        foreach ($this->totalExeternalExperiences() as $experience) {
+            preg_match('/(\d+) years (\d+) months (\d+) days/', $experience, $matches);
+
+            $totalSum['years'] += (int)$matches[1];
+            $totalSum['months'] += (int)$matches[2];
+            $totalSum['days'] += (int)$matches[3];
+        }
+
+        // Adjust for cases where months > 12
+        $totalSum['years'] += intdiv($totalSum['months'], 12);
+        $totalSum['months'] = $totalSum['months'] % 12;
+
+        // Adjust for cases where days > 29
+        if ($totalSum['days'] > 29) {
+            $totalSum['months'] += intdiv($totalSum['days'], 30);
+            $totalSum['days'] = $totalSum['days'] % 30;
+        }
+
+        return $totalSum;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    public function totalExperiences()
+    {
+        $totalSumInternal = $this->calculateTotalSum();
+        $totalSumExternal = $this->calculateExTotalSum();
+        // Merge the arrays to combine internal and external experience durations
+        $totalSum = [
+            'years' => $totalSumInternal['years'] + $totalSumExternal['years'],
+            'months' => $totalSumInternal['months'] + $totalSumExternal['months'],
+            'days' => $totalSumInternal['days'] + $totalSumExternal['days'],
+        ];
+        // Adjust for cases where months > 12
+        $totalSum['years'] += intdiv($totalSum['months'], 12);
+        $totalSum['months'] = $totalSum['months'] % 12;
+
+        // Adjust for cases where days > 29
+        if ($totalSum['days'] > 29) {
+            $totalSum['months'] += intdiv($totalSum['days'], 30);
+            $totalSum['days'] = $totalSum['days'] % 30;
+        }
+        return $totalSum;
+    }
 
 
     /**
@@ -602,27 +603,27 @@ public function totalExperiences()
      */
     public function region(): BelongsTo
     {
-        return $this->belongsTo(Region::class,'region_id','id');
+        return $this->belongsTo(Region::class, 'region_id', 'id');
     }
 
     public function zone(): BelongsTo
     {
-        return $this->belongsTo(Zone::class,'zone_id','id');
+        return $this->belongsTo(Zone::class, 'zone_id', 'id');
     }
     public function woreda(): BelongsTo
     {
-        return $this->belongsTo(Woreda::class,'woreda_id','id');
+        return $this->belongsTo(Woreda::class, 'woreda_id', 'id');
     }
     public function kebele(): BelongsTo
     {
-        return $this->belongsTo(Kebele::class,'kebele_id','id');
+        return $this->belongsTo(Kebele::class, 'kebele_id', 'id');
     }
 
 
 
     public function educationLevel(): BelongsTo
     {
-        return $this->belongsTo(EducationalLevel::class,'educational_level_id','id');
+        return $this->belongsTo(EducationalLevel::class, 'educational_level_id', 'id');
     }
 
     /**
@@ -643,23 +644,23 @@ public function totalExperiences()
     {
         return $this->hasMany(EmployeeEducation::class);
     }
-    public function certifications():HasMany
+    public function certifications(): HasMany
     {
         return $this->hasMany(EmployeeCertificate::class);
     }
-    public function account() : HasOne {
-        
-    return $this->hasOne(User::class);
-            
-    }
-    
+    public function account(): HasOne
+    {
 
-  //////////////////////////////////////////////////////
+        return $this->hasOne(User::class);
+    }
+
+
+    //////////////////////////////////////////////////////
     public function getAgeAttribute()
     {
         return now()->diffInYears($this->date_of_birth);
     }
-   /////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////
     /**
      * Get all of the evaluations for the Employee
      *
@@ -682,36 +683,36 @@ public function totalExperiences()
         return $this->hasMany(EmployeeFamily::class, 'employee_id', 'id');
     }
 
-    public function getSalary($employeeId){
-     $level  =    Employee::where('id', $employeeId)?->position?->jobTitle?->level_id;
-     $startSalary  =    JobGrade::where('level_id', $level)->first()?->start_salary;
-     $level_id  =    JobGrade::where('level_id', $level)->first()?->id;
-     $step  =    Employee::where('id', $employeeId)->first()?->horizontal_level;
-      //horizontal_level 
-      if($step =='Start')
-      return  JobGrade::getValueByIdAndColumn($level_id, 'start_salary');
-      elseif($step ==1) 
-      return JobGrade::getValueByIdAndColumn($level_id , 'one');
-      elseif($step ==2)
-      return JobGrade::getValueByIdAndColumn($level_id , 'two');
-      elseif($step ==3)
-      return JobGrade::getValueByIdAndColumn($level_id , 'three');
-      elseif($step ==4)
-      return  JobGrade::getValueByIdAndColumn($level_id , 'four');
-      elseif($step ==5)
-      return  JobGrade::getValueByIdAndColumn($level_id , 'five');
-      elseif($step ==6)
-      return  JobGrade::getValueByIdAndColumn($level_id , 'six');
-      elseif($step ==7)
-      return JobGrade::getValueByIdAndColumn($level_id , 'seven');
-      elseif($step ==8)
-      return  JobGrade::getValueByIdAndColumn($level_id , 'eight');
-      elseif($step ==9)
-      return  JobGrade::getValueByIdAndColumn($level_id , 'nine'); 
-      elseif($step ==null)
-      return  JobGrade::getValueByIdAndColumn($level_id , 'start_salary'); 
-      else
-          return JobGrade::getValueByIdAndColumn($level_id, 'ceil_salary');
-
+    public function getSalary($employeeId)
+    {
+        $level  =    Employee::where('id', $employeeId)?->position?->jobTitle?->level_id;
+        $startSalary  =    JobGrade::where('level_id', $level)->first()?->start_salary;
+        $level_id  =    JobGrade::where('level_id', $level)->first()?->id;
+        $step  =    Employee::where('id', $employeeId)->first()?->horizontal_level;
+        //horizontal_level 
+        if ($step == 'Start')
+            return  JobGrade::getValueByIdAndColumn($level_id, 'start_salary');
+        elseif ($step == 1)
+            return JobGrade::getValueByIdAndColumn($level_id, 'one');
+        elseif ($step == 2)
+            return JobGrade::getValueByIdAndColumn($level_id, 'two');
+        elseif ($step == 3)
+            return JobGrade::getValueByIdAndColumn($level_id, 'three');
+        elseif ($step == 4)
+            return  JobGrade::getValueByIdAndColumn($level_id, 'four');
+        elseif ($step == 5)
+            return  JobGrade::getValueByIdAndColumn($level_id, 'five');
+        elseif ($step == 6)
+            return  JobGrade::getValueByIdAndColumn($level_id, 'six');
+        elseif ($step == 7)
+            return JobGrade::getValueByIdAndColumn($level_id, 'seven');
+        elseif ($step == 8)
+            return  JobGrade::getValueByIdAndColumn($level_id, 'eight');
+        elseif ($step == 9)
+            return  JobGrade::getValueByIdAndColumn($level_id, 'nine');
+        elseif ($step == null)
+            return  JobGrade::getValueByIdAndColumn($level_id, 'start_salary');
+        else
+            return JobGrade::getValueByIdAndColumn($level_id, 'ceil_salary');
     }
 }

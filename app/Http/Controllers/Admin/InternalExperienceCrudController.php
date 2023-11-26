@@ -128,26 +128,20 @@ class InternalExperienceCrudController extends CrudController
         return $this->crud->performSaveAction($item->getKey());
     }
 
-    public function update($id)
+    public function update()
     {
         $this->crud->hasAccessOrFail('update');
-
-        $request = $this->crud->validateRequest();
+        $this->crud->validateRequest();
         $data = $this->crud->getStrippedSaveRequest();
+        $currentEntryId = $this->crud->getCurrentEntryId();
+
         if ($data['end_date'] !== null) {
             if ($data['start_date'] >= $data['end_date']) {
                 throw ValidationException::withMessages(['start_date' => 'Start-date must be less than End-date!']);
             }
         }
-        $item = $this->crud->model->findOrFail($id);
-
-        try {
-            $item->update($data);
-        } catch (\Exception $e) {
-            Log::error('Update Error: ' . $e->getMessage());
-            throw $e;
-        }
-
+        $item = $this->crud->model->findOrFail($currentEntryId);
+        $item->update($data);
         $this->data['entry'] = $this->crud->entry = $item;
 
         Alert::success(trans('backpack::crud.update_success'))->flash();

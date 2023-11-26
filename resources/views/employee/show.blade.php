@@ -32,7 +32,7 @@
 
 <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
 <script src="{{ asset('assets/js/webcam.min.js') }}"></script>
-<script src="{{ asset('assets/js/bootstrap.min.js')}}"></script>
+<script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/js/howler.min.js') }}"></script>
 <script src="{{ asset('assets/js/axios.min.js') }}"></script>
 
@@ -144,9 +144,9 @@
 
 
 
-             
-       
-          
+
+
+
 
 
             {{-- <button type="button" data-toggle="modal" data-target="#back" target="_top"
@@ -187,9 +187,9 @@
                 @endcanany
             @endif
 
-            <button type="button"
-            class="btn  btn-sm btn-primary float-right mr-1">FN: {{ $crud->entry->file_number ?? "-" }}
-        </button>
+            <button type="button" class="btn  btn-sm btn-primary float-right mr-1">FN:
+                {{ $crud->entry->file_number ?? '-' }}
+            </button>
 
         </div>
         {{-- @endcan --}}
@@ -282,9 +282,9 @@
 
                             <img src="{{ $crud->entry?->photo }}" id="image" class="after_capture_frame img-fluid"
                                 alt="profile Pic" height="220" width="200">
-                                 
+
                         </div>
-                     
+
                         <hr>
                         <div class="row">
                             <div class="col-md-12">
@@ -390,7 +390,7 @@
                                                 console.log('Image saved successfully:', response.data);
 
                                                 window.location.href = `https://hrm.ju.edu.et/employee/{entryId}/show`;
-                                               //  window.location.href = `http://127.0.0.1:8000/employee/${entryId}/show`;
+                                                //  window.location.href = `http://127.0.0.1:8000/employee/${entryId}/show`;
                                                 Webcam.reset();
                                             } else {
                                                 console.error('Error saving image:', response.data);
@@ -529,17 +529,15 @@
                                         title="From date of permanent:     {{ $crud->entry->getEmployementDateRange() }} ">
                                         {{-- {{ $crud->entry->getEmployementDateRange() }} --}}
 
-                                     
-                                      @if($crud->entry->internalExperiences->count() > 0 or $crud->entry->externalExperiences->count() > 0)
 
-                                        {{ $crud->entry->totalExperiences()['years'] }} years
-                                        {{ $crud->entry->totalExperiences()['months'] }} months
-                                        {{ $crud->entry->totalExperiences()['days'] }} days
+                                        @if ($crud->entry->internalExperiences->count() > 0 or $crud->entry->externalExperiences->count() > 0)
+                                            {{ $crud->entry->totalExperiences()['years'] }} years
+                                            {{ $crud->entry->totalExperiences()['months'] }} months
+                                            {{ $crud->entry->totalExperiences()['days'] }} days
                                         @else
-                                        {{ $crud->entry->getEmployementDateRange() }}
-
+                                            {{ $crud->entry->getEmployementDateRange() }}
                                         @endif
-                                  
+
                                     </label>
                                 </div>
                                 @if ($crud->entry->employment_status_id == 1)
@@ -1528,34 +1526,34 @@
 
 
                     <div role="tabpanel" class="tab-pane" id="tab_employee_internal_experience">
-                   
+
                         <div class=" no-padding no-border">
                             <div class="">
 
                                 @canany(['employee.internal-experience.icrud', 'employee.internal-experience.create'])
                                     <a href="{{ route('{employee}/internal-experience.create', ['employee' => $crud->entry?->id]) }}"
                                         class="btn btn-primary" data-style="zoom-in">
-                                        <span class="ladda-label"><i class="la la-plus"></i> {{ trans('backpack::crud.add') }}
-                                            {{ 'Employee Internal Experience' }}</span> </a> 
+                                        <span class="ladda-label"><i class="la la-plus"></i>
+                                            {{ trans('backpack::crud.add') }}
+                                            {{ 'Employee Internal Experience' }}</span> </a>
 
 
-                                            <a href="#" class="btn  btn-outline-primary mr-1" data-style="zoom-in">
-                                                <span class="ladda-label">
+                                    <a href="#" class="btn  btn-outline-primary mr-1" data-style="zoom-in">
+                                        <span class="ladda-label">
 
-                                                    Total Internal Exp: 
+                                            Total Internal Exp:
 
-                                    <strong>
-                                                    {{  $crud->entry->calculateTotalSum()['years'] }} years
-                                                    {{  $crud->entry->calculateTotalSum()['months'] }} months
-                                                    {{  $crud->entry->calculateTotalSum()['days'] }} days
-                                    </strong>
+                                            <strong>
+                                                {{ $crud->entry->calculateTotalSum()['years'] }} years
+                                                {{ $crud->entry->calculateTotalSum()['months'] }} months
+                                                {{ $crud->entry->calculateTotalSum()['days'] }} days
+                                            </strong>
 
-                                                    </span> 
-                                                </a> 
-        
+                                        </span>
+                                    </a>
                                 @endcanany
 
-                          
+
                             </div>
                             <table id="crudTable"
                                 class="bg-white table table-striped table-hover nowrap rounded shadow-xs mt-2"
@@ -1582,10 +1580,6 @@
                                             <td>
 
                                             <td>
-
-
-
-                                                
 
                                                 @canany(['employee.internal-experience.icrud',
                                                     'employee.internal-experience.edit'])
@@ -1629,18 +1623,18 @@
                                             {{ 'Employee External Experience' }}</span></a>
 
 
-                                            <a href="#" class="btn  btn-outline-primary mr-1" data-style="zoom-in">
-                                                <span class="ladda-label">
+                                    <a href="#" class="btn  btn-outline-primary mr-1" data-style="zoom-in">
+                                        <span class="ladda-label">
 
-                                                    Total External Exp:
-                                                    <strong>
-                                                    {{  $crud->entry->calculateExTotalSum()['years'] }} years
-                                                    {{  $crud->entry->calculateExTotalSum()['months'] }} months
-                                                    {{  $crud->entry->calculateExTotalSum()['days'] }} days
-                                                    </strong>
+                                            Total External Exp:
+                                            <strong>
+                                                {{ $crud->entry->calculateExTotalSum()['years'] }} years
+                                                {{ $crud->entry->calculateExTotalSum()['months'] }} months
+                                                {{ $crud->entry->calculateExTotalSum()['days'] }} days
+                                            </strong>
 
-                                                    </span> 
-                                                </a> 
+                                        </span>
+                                    </a>
                                 @endcanany
                             </div>
                             <table id="crudTable"
@@ -1809,115 +1803,118 @@
     <script src="{{ asset('packages/backpack/crud/js/show.js') . '?v=' . config('backpack.base.cachebusting_string') }}">
     </script>
 
-<script>
-    $(function() {
-        @if (old('code') != null && $errors->has('new') == false)
-            $('#position_code_edit').modal('show');
-        @endif
-    });
+    <script>
+        $(function() {
+            @if (old('code') != null && $errors->has('new') == false)
+                $('#position_code_edit').modal('show');
+            @endif
+        });
 
-    function editEntry(route, value) {
-        $('#position_code_edit_form').attr('action', route);
-        $('#old_job_code').val(value);
-        $('#job_code').val('');
-    }
+        function editEntry(route, value) {
+            $('#position_code_edit_form').attr('action', route);
+            $('#old_job_code').val(value);
+            $('#job_code').val('');
+        }
 
-    function deleteEntry(button) {
-        var route = $(button).attr('data-route');
+        function deleteEntry(button) {
+            var route = $(button).attr('data-route');
 
-        swal({
-            title: "{!! trans('backpack::base.warning') !!}",
-            text: "{!! trans('backpack::crud.delete_confirm') !!}",
-            icon: "warning",
-            buttons: ["{!! trans('backpack::crud.cancel') !!}", "{!! trans('backpack::crud.delete') !!}"],
-            dangerMode: true,
-        }).then((value) => {
-            if (value) {
-                $.ajax({
-                    url: route,
-                    type: 'DELETE',
-                    success: function(result) {
-                        if (result == 1) {
-                            // Redraw the table
-                            if (typeof crud != 'undefined' && typeof crud.table !=
-                                'undefined') {
-                                // Move to previous page in case of deleting the only item in the table
-                                if (crud.table.rows().count() === 1) {
-                                    crud.table.page("previous");
+            swal({
+                title: "{!! trans('backpack::base.warning') !!}",
+                text: "{!! trans('backpack::crud.delete_confirm') !!}",
+                icon: "warning",
+                buttons: ["{!! trans('backpack::crud.cancel') !!}", "{!! trans('backpack::crud.delete') !!}"],
+                dangerMode: true,
+            }).then((value) => {
+                if (value) {
+                    $.ajax({
+                        url: route,
+                        type: 'DELETE',
+                        success: function(result) {
+                            if (result == 1) {
+                                // Redraw the table
+                                if (typeof crud != 'undefined' && typeof crud.table !=
+                                    'undefined') {
+                                    // Move to previous page in case of deleting the only item in the table
+                                    if (crud.table.rows().count() === 1) {
+                                        crud.table.page("previous");
+                                    }
+                                    $(button).parent().parent().remove();
+                                    crud.table.draw(false);
                                 }
-                                $(button).parent().parent().remove();
-                                crud.table.draw(false);
+
+                                // Show a success notification bubble
+                                new Noty({
+                                    type: "success",
+                                    text: "{!! '<strong>' .
+                                        trans('backpack::crud.delete_confirmation_title') .
+                                        '</strong><br>' .
+                                        trans('backpack::crud.delete_confirmation_message') !!}"
+                                }).show();
+
+                                // Hide the modal, if any
+                                $('.modal').modal('hide');
+                            } else {
+                                // Handle notifications
+                                handleNotifications(result);
                             }
-
-                            // Show a success notification bubble
-                            new Noty({
-                                type: "success",
-                                text: "{!! '<strong>' . trans('backpack::crud.delete_confirmation_title') . '</strong><br>' . trans('backpack::crud.delete_confirmation_message') !!}"
-                            }).show();
-
-                            // Hide the modal, if any
-                            $('.modal').modal('hide');
-                        } else {
-                            // Handle notifications
+                        },
+                        error: function(result) {
+                            // Show an alert with the result
                             handleNotifications(result);
                         }
-                    },
-                    error: function(result) {
-                        // Show an alert with the result
-                        handleNotifications(result);
-                    }
-                });
-            }
-        });
-    }
-
-    function handleNotifications(result) {
-        // If the result is an array, it means we have notification bubbles to show
-        if (result instanceof Object) {
-            // Trigger one or more bubble notifications
-            Object.entries(result).forEach(function(entry, index) {
-                var type = entry[0];
-                entry[1].forEach(function(message, i) {
-                    new Noty({
-                        type: type,
-                        text: message
-                    }).show();
-                });
-            });
-        } else {
-            // Show an error alert
-            swal({
-                title: "{!! trans('backpack::crud.delete_confirmation_not_title') !!}",
-                text: "{!! trans('backpack::crud.delete_confirmation_not_message') !!}",
-                icon: "error",
-                timer: 4000,
-                buttons: false,
+                    });
+                }
             });
         }
-    }
 
-    // Initialize Select2 Elements
-    $(document).ready(function() {
-        $('.select2').select2();
-    });
+        function handleNotifications(result) {
+            // If the result is an array, it means we have notification bubbles to show
+            if (result instanceof Object) {
+                // Trigger one or more bubble notifications
+                Object.entries(result).forEach(function(entry, index) {
+                    var type = entry[0];
+                    entry[1].forEach(function(message, i) {
+                        new Noty({
+                            type: type,
+                            text: message
+                        }).show();
+                    });
+                });
+            } else {
+                // Show an error alert
+                swal({
+                    title: "{!! trans('backpack::crud.delete_confirmation_not_title') !!}",
+                    text: "{!! trans('backpack::crud.delete_confirmation_not_message') !!}",
+                    icon: "error",
+                    timer: 4000,
+                    buttons: false,
+                });
+            }
+        }
 
-    // // make it so that the function above is run after each DataTable draw event
-    //  crud.addFunctionToDataTablesDrawEventQueue('deleteEntry');
+        // Initialize Select2 Elements
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
 
-    function createPopupWin(pageURL, pageTitle, popupWinWidth, popupWinHeight) {
-        var left = (screen.width - popupWinWidth) / 2;
-        var top = (screen.height - popupWinHeight) / 4;
+        // // make it so that the function above is run after each DataTable draw event
+        //  crud.addFunctionToDataTablesDrawEventQueue('deleteEntry');
 
-        var myWindow = window.open(pageURL, pageTitle,
-            'resizable=yes, width=' + popupWinWidth +
-            ', height=' + popupWinHeight + ', top=' +
-            top + ', left=' + left);
-    }
-</script>
+        function createPopupWin(pageURL, pageTitle, popupWinWidth, popupWinHeight) {
+            var left = (screen.width - popupWinWidth) / 2;
+            var top = (screen.height - popupWinHeight) / 4;
+
+            var myWindow = window.open(pageURL, pageTitle,
+                'resizable=yes, width=' + popupWinWidth +
+                ', height=' + popupWinHeight + ', top=' +
+                top + ', left=' + left);
+        }
+    </script>
 
 
 
-<script src="{{ asset('assets/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('assets/select2/dist/js/select2.min.js') }}"></script>
 
 
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

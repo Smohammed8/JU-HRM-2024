@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\ExternalExperienceRequest;
+use App\Models\ExternalExperience;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -32,7 +33,7 @@ class ExternalExperienceCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\ExternalExperience::class);
+        CRUD::setModel(ExternalExperience::class);
         $employeeId = Route::current()->parameter('employee');
 
         CRUD::setRoute(config('backpack.base.route_prefix') . '/' . $employeeId . '/external-experience');
@@ -130,31 +131,24 @@ class ExternalExperienceCrudController extends CrudController
         return $this->crud->performSaveAction($item->getKey());
     }
 
-    public function update($id)
+    public function update()
     {
         $this->crud->hasAccessOrFail('update');
-
-        $request = $this->crud->validateRequest();
+        $this->crud->validateRequest();
         $data = $this->crud->getStrippedSaveRequest();
-
+        $currentEntryId = $this->crud->getCurrentEntryId();
         if ($data['start_date'] >= $data['end_date']) {
             throw ValidationException::withMessages(['start_date' => 'Start-date must be less than End-date!']);
         }
+       $item = $this->crud->model->findOrFail( $currentEntryId );
 
-        $item = $this->crud->model->findOrFail($id);
-
-        try {
-            $item->update($data);
-        } catch (\Exception $e) {
-            Log::error('Update Error: ' . $e->getMessage());
-            throw $e;
-        }
-
+       // $item = ExternalExperience::findOrFail( $currentEntryId );
+        
+        $item->update($data);
         $this->data['entry'] = $this->crud->entry = $item;
 
         Alert::success(trans('backpack::crud.update_success'))->flash();
         $this->crud->setSaveAction();
-
         return $this->crud->performSaveAction($item->getKey());
     }
 

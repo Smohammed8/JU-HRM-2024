@@ -921,8 +921,6 @@ CRUD::field('kebele_id')->type('select2')->entity('kebele')->model(Kebele::class
        $backyear =  $yr-40; // 2016 - 1976 = 40
        $month =  Carbon::parse($cYear)->month;
        ///////////////////////////////////////////////////
-
-
     if ($this->crud->entry->employee_sub_category_id !== null && $this->crud->entry->position_id !== null) {
         throw ValidationException::withMessages([
             'position_id' => 'Either Job Position or sub category must be selected!',
