@@ -13,6 +13,6 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
-#!/vendor/backpack/crud/src/LicenseCheck.php
+!/vendor/backpack/crud/src/LicenseCheck.php
 /public/staff
 #assets/js/canvasjs.min.js
