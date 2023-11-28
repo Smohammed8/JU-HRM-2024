@@ -111,14 +111,14 @@ class EmployeeController extends Controller
     }
 
 
-// public function fetchSubCategories($category)
-// {
-//     $subCategories = EmployeeSubCategory::where('employee_category_id', $category)->pluck('name', 'id');
-
-//     return response()->json($subCategories);
-// }
+public function getGridView()
+{
+    
+    $employees = Employee::paginate(10); // You can adjust the number of items per page
 
 
+    return view('employee.grid_view', compact('employees'));
+}
 
 public function fetchSubCategories(Request $request)
 {

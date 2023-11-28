@@ -72,9 +72,14 @@ color:black;
     @can('employee.index')
         <li class="nav-item"><a class="nav-link" href="{{ backpack_url('employee') }}">
             <i class='nav-icon la la-caret-right'></i> 
-                <span>All Employees</span></a></li>
+                <span>Employee List View</span></a></li>
     @endcanany
 
+    @canany(['application.index', 'application.icrud'])
+    <li class='nav-item'><a class='nav-link' href="{{ route('grid.view') }}">  <i
+        class='nav-icon la la-caret-right'></i> Employee Grid View </a></li>
+    @endcanany
+    
     @canany(['application.index', 'application.icrud'])
     <li class='nav-item'><a class='nav-link' href='{{ backpack_url('application') }}'>  <i
         class='nav-icon la la-caret-right'></i> Active Applications </a></li>

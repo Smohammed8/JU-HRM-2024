@@ -93,6 +93,8 @@ Route::get('/export', [EmployeeCrudController::class, 'export-form'])->name('exp
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+Route::get('/grid-view', [EmployeeController::class, 'getGridView'])->name('grid.view');
+
 // Route::get('webcam', [EmployeeCrudController::class, 'index']);
 Route::post('webcam', [EmployeeCrudController::class, 'uploadPhoto'])->name('webcam.capture');
 

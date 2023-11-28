@@ -470,10 +470,6 @@ class Employee extends  Model
 
         return $totalSum;
     }
-
-
-
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     public function totalExeternalExperiences()
     {
@@ -494,7 +490,6 @@ class Employee extends  Model
             }
 
             $dateDiff = $startDate->diff($endDate);
-
             $totalYears = intdiv($dateDiff->y, 1);
             $totalMonths = intdiv(($dateDiff->m + $dateDiff->y * 12), 12);
             $totalDays = $dateDiff->d;
@@ -533,7 +528,6 @@ class Employee extends  Model
 
         return $totalSum;
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     public function totalExperiences()
