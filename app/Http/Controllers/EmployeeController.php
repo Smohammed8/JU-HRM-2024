@@ -114,7 +114,8 @@ class EmployeeController extends Controller
 public function getGridView()
 {
     
-    $employees = Employee::paginate(10); // You can adjust the number of items per page
+    
+    $employees = Employee::paginate(12); // You can adjust the number of items per page
 
 
     return view('employee.grid_view', compact('employees'));

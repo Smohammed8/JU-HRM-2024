@@ -9,8 +9,10 @@
             <h4> Grid View </h4>
         </div>
         <div class="col-sm-6">
-            <a style="float:right;" class="btn btn-sm btn-outline-primary mr-1" href="{{ backpack_url('employee') }}"> <i class="fa fa-plus"> </i> Create new</a>
+            <a style="float:right;" class="btn btn-sm btn-outline-primary mr-1" href="{{ backpack_url('employee/create') }}"> <i class="fa fa-plus"> </i> Create new</a>
             <a style="float:right;"  class="btn btn-sm  btn-outline-primary mr-1" href="{{ backpack_url('employee') }}"> <i class="fa fa-list"> </i> List View</a>
+
+        
         </div>
       </div>
     </div><!-- /.container-fluid -->
@@ -46,7 +48,17 @@
                  <h3 class="lead"><b>   <a  style="font-size:16px;" href="{{ route('employee', ['employee_id' => $employee->id]) }}">
              
                  {{ $employee->name }} </a> </b></h3>
-                 <hr>
+             
+                 <style>
+                    hr.custom-hr {
+                      color: #0067b8 !important;
+                      border-width: 2px;
+                    }
+                  </style>
+                  
+                  <hr class="custom-hr">
+                  
+
                  <p class="text-muted text-sm"><b>About: </b> <br> {{ $employee->position->jobTitle->name ?? '-' }} at {{ $employee->position->unit->name ?? '-' }}  </p>
              
                  <ul class="ml-4 mb-0 fa-ul text-muted">
@@ -65,10 +77,8 @@
 
 
 
+                <img src="{{ $employee->photo ? : 'employee.jpg' }}" alt="profile Pic" class="img elevation-2" style="border: 2px double #ccc; max-width: 100px; max-height: 100px;">
 
-                {{-- <img width="100px" src="{{ asset('storage/employee/'.$employee->photo ?: 'profile.png') }}" class="img-circle elevation-2"> --}}
-
-                <img width="100px" src="{{ $employee->photo ? : 'employee.jpg' }}" alt="profile Pic" class="img elevation-2" style="border: 2px double #ccc;">
 
 
                  </div>
