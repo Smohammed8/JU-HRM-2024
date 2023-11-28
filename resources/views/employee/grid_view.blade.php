@@ -53,9 +53,11 @@
                     hr.custom-hr {
                       color: #0067b8 !important;
                       border-width: 2px;
+                  
                     }
                   </style>
                   
+               
                   <hr class="custom-hr">
                   
 

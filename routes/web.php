@@ -90,8 +90,10 @@ Route::get('/export', [EmployeeCrudController::class, 'export-form'])->name('exp
 // Route::get('/details', [PlacementChoiceCrudController::class, 'details'])->name('details');
  Route::get('employee/{employee_id}/show', [EmployeeCrudController::class, 'show'])->name('employee');
  Route::get('{new_position_id?}/details', [PlacementChoiceCrudController::class, 'details'])->name('PlacementChoice.details');
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+ 
+//////////////////////////////////////////////////////////////////
+Route::apiResource('employees', 'EmployeeController');
+//////////////////////////////////////////////////////////////////
 
 Route::get('/grid-view', [EmployeeController::class, 'getGridView'])->name('grid.view');
 

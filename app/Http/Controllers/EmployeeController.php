@@ -111,12 +111,59 @@ class EmployeeController extends Controller
     }
 
 
+  ////////////////////////////////////////////////////////////////////////////
+    public function index()
+    {
+        return response()->json(Employee::all());
+    }
+
+    public function show($id)
+    {
+        return response()->json(Employee::find($id));
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:employees,email,' . $id,
+            // Add validation rules for other fields as needed
+        ]);
+
+        $employee = Employee::findOrFail($id);
+        $employee->update($request->all());
+
+        return response()->json($employee);
+    }
+
+    public function destroy($id)
+    {
+        $employee = Employee::findOrFail($id);
+        $employee->delete();
+
+        return response()->json(['message' => 'Employee deleted successfully']);
+    }
+    ////////////////////////////// other system used this to access employee infor ////////////////////
+    public function getEmployeeInfoFromSystemA($employeeId)
+{
+    $response = Http::get('http://127.0.0.1:8000/api/v1/employees/' . $employeeId);
+
+    if ($response->successful()) {
+        $employeeData = $response->json();
+    
+        return $employeeData;
+    } else {
+
+        return response()->json(['error' => 'Unable to fetch employee information from System A'], $response->status());
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 public function getGridView()
 {
-    
-    
-    $employees = Employee::paginate(12); // You can adjust the number of items per page
 
+    $employees = Employee::paginate(12); // You can adjust the number of items per page
 
     return view('employee.grid_view', compact('employees'));
 }

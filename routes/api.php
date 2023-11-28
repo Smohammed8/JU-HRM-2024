@@ -17,5 +17,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Route::group(['prefix' => 'v1'], function () {
+//     Route::apiResource('employees', EmployeeController::class);
+// });
 
 
+// Route::group(['prefix' => 'v1'], function () {
+//     Route::apiResource('employees', EmployeeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+// });
+
+Route::group(['prefix' => 'v1'], function () {
+    Route::apiResource('employees', EmployeeController::class)->only(['index', 'show']);
+});
+
+
+// GET: /api/v1/employees - Retrieve all employees
+// GET: /api/v1/employees/{id} - Retrieve a specific employee
+// POST: /api/v1/employees - Create a new employee
+// PUT/PATCH: /api/v1/employees/{id} - Update an employee
+// DELETE: /api/v1/employees/{id} - Delete an employee
